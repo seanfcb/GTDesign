@@ -149,7 +149,7 @@ W56 = m_coola*Cpg*(T05-T06a)*eta_hpt
 table1("High pressure turbine (5-->6a)", round(T06a,2), round(P06a,2), round(W56,2))
 
 ########################################################
-#           Hot stream  HPT Vane Cooling  6a-->6b               #
+#           Hot stream  HPT Disk  Cooling  6a-->6b     #
 ########################################################
 m_hb    = 0.0265*m_hot
 m_coolb = m_coola + m_hb
