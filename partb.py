@@ -19,7 +19,7 @@ def eqn6(M1,C1,T01,gamma,Rs):
 #                             [P] = kPa, [T] = K                                    #
 #####################################################################################
 
-N     = 10000 #RPM
+N     = 12000 #RPM
 gamma = 1.4
 mdot  = 15/2.205
 Rs    = 287
@@ -39,7 +39,7 @@ P02 = P04
 #####################################################################################
 
 HTR = np.linspace(0.4,0.7,100) #Hub to tip ratio, typical values for centrifugal compressors
-alpha1 = [20*np.pi/180]#np.linspace(5,35, int((35-5)/5+1))*np.pi/180 #given alpha1 angle range
+alpha1 = np.linspace(5,35, int((35-5)/5+1))*np.pi/180 #given alpha1 angle range[20*np.pi/180]
 r1h = 0.194852941 #coordinate values from WebplotDigitizer
 r1T = 0.268382353 #coordinate values from WebplotDigitizer
 CT_ratio = r1h/r1T #Ratio of impeller inlet hub radius to turbine hub radius
@@ -51,6 +51,7 @@ Mrel1sh = 0*r1sh
 U1sh = 0*r1sh
 U1m  = 0*r1sh
 C1x  = 0*r1sh
+spec = 0*r1sh
 ##Begin solutionf
 fig = plt.figure()
 
@@ -65,8 +66,8 @@ for i in alpha1: #iterating for every alpha value
 
         while delrho > 1e-5:
             C1x[rcount] = mdot/(rho1*A_inlet)
-            spec = N*2*np.pi/60*np.sqrt(C1x[rcount]*A_inlet)*(1/(P02-P01))**(3/4)
-            print(spec)
+            spec[rcount] = N*2*np.pi/60*np.sqrt(C1x[rcount]*A_inlet)*(1/(P02-P01))**(3/4)
+            #print(spec)
             C1  = C1x[rcount]/np.cos(i)
             M1  = bisect(eqn6,0,0.99999,args=(C1,T01,gamma,Rs))
             c1  = C1/M1
@@ -82,12 +83,14 @@ for i in alpha1: #iterating for every alpha value
         rcount = rcount + 1
     rc('font', **{'family': 'serif', 'serif': ['Times New Roman']})
     rc('text', usetex=True)
-    plt.plot(C1x,Mrel1sh, label = r'$\alpha_1 = {}$'.format(round(i*180/np.pi)))
+    plt.plot(C1x/U1sh,Mrel1sh, label = r'$\alpha_1 = {}$'.format(round(i*180/np.pi)))
     plt.xlabel(r"$C_{1x}/U_{1sh}$")
     plt.ylabel(r"$M_{rel,1sh}$")
     plt.legend()
-    fig.savefig('Mrel1sh_vs_C1x.png', dpi=fig.dpi)
 
+fig.savefig('Mrel1sh_vs_C1x.png', dpi=fig.dpi)
+plt.show()
 Mach_index = np.argmin(Mrel1sh)
 Mrel1sh = Mrel1sh[Mach_index]
 r1sh    = r1sh[Mach_index]
+spec    = spec[Mach_index]
