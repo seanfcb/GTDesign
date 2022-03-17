@@ -310,12 +310,17 @@ P0star  = Pstar/Pstar_ratio
 phip   = (Pstar-P3)/(P03-P3) #LE to throat static pressure recovery coefficient
 Bstar_throat = 0.03
 Astar = mdot*np.sqrt(T0star*Rs/1000/gamma)/(1*(1+(gamma-1)/2*1**2)**((gamma+1)/(2-2*gamma))*P0star*(1-Bstar_throat))
+
+
+
 #####################################################################################
 #                                Diffuser exit                                      #
 #####################################################################################
 r4r3 = 3 #Radius ratio
 r4 = r3*r4r3
 A4  = A4_ratio*Astar
+Nv = 19
+
 
 #Throat to exit static pressure recovery
 Cp = (P4-Pstar)/(P0star-Pstar)
