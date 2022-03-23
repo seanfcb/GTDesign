@@ -66,7 +66,7 @@ spec = 0*r1sh
 #####################################################################################
 #                              Begin solution                                       #
 #####################################################################################
-fig = plt.figure()
+#fig = plt.figure()
 
 for i in alpha1: #iterating for every alpha value
     rcount = 0
@@ -95,12 +95,12 @@ for i in alpha1: #iterating for every alpha value
         W1sh = np.sqrt(C1x[rcount]**2+(U1sh[rcount]-C1x[rcount]*np.tan(i))**2)
         Mrel1sh[rcount] = W1sh/c1
         rcount = rcount + 1
-    rc('font', **{'family': 'serif', 'serif': ['Times New Roman']})
-    rc('text', usetex=True)
-    plt.plot(C1x,Mrel1sh, label = r'$\alpha_1 = {}$'.format(round(i*180/np.pi,3)))
-    plt.xlabel(r"$C_{1x}/U_{1sh}$")
-    plt.ylabel(r"$M_{rel,1sh}$")
-    plt.legend()
+    # rc('font', **{'family': 'serif', 'serif': ['Times New Roman']})
+    # rc('text', usetex=True)
+    # plt.plot(C1x,Mrel1sh, label = r'$\alpha_1 = {}$'.format(round(i*180/np.pi,3)))
+    # plt.xlabel(r"$C_{1x}/U_{1sh}$")
+    # plt.ylabel(r"$M_{rel,1sh}$")
+    # plt.legend()
 
 #fig.savefig('Mrel1sh_vs_C1x.png', dpi=fig.dpi)
 #plt.show()
@@ -146,10 +146,6 @@ beta1sh_star = beta1h - ish_min #blade metal angle
 #                                 Display inlet properties                          #
 #####################################################################################
 
-# table1("Location", "alpha1","beta1", "i1", "N (RPM)","Specific Speed", "Mrel1sh", "r1 (m)", "C1x","C1","U1","W1")
-# table1("Hub",round(alpha1*180/np.pi,4),beta1h,alpha1*180/np.pi-beta1h,N,spec,Mrel1sh,r1h,C1x,C1,U1h,W1h)
-# table1("Mean",round(alpha1*180/np.pi,4),beta1m,alpha1*180/np.pi-beta1m,N,spec,Mrel1sh,r1m,C1x,C1,U1m,W1m)
-# table1("Shroud",round(alpha1*180/np.pi,4),beta1sh,alpha1*180/np.pi-beta1sh,N,spec,Mrel1sh,r1sh,C1x,C1,U1sh,W1sh)
 table1("Location", "alpha1","beta1", "Blade metal angle", "Incidence", "N (RPM)","Specific Speed", "Mrel1sh", "r1 (m)", "C1x","C1","U1","W1")
 table1("Hub",round(alpha1*180/np.pi,4),beta1h,beta1h_star,ih_min,N,spec,Mrel1sh,r1h,C1x,C1,U1h,W1h)
 table1("Mean",round(alpha1*180/np.pi,4),beta1m,beta1m_star,im_min,N,spec,Mrel1sh,r1m,C1x,C1,U1m,W1m)
@@ -184,7 +180,7 @@ for j in U2:
             Crat = Cr2/C1x
             if Crat > 0.8 and Crat < 1 and Wrat > 0.5 and Wrat < 0.6:
                 table2(round(np.abs(Crat),5),round(Wrat,5), round(i*180/np.pi,3),round(Ct2,3),round(W2,3),round(Ct2i,3),round(Wt2i,3),round(W2i,3),round(j,3))
-print(tabulate(tab2))
+#print(tabulate(tab2))
 
 ############Taking velocities and angles from table2
 U2   = 418.907
@@ -196,6 +192,27 @@ W2   = 144.886
 Ct2i = 388.784
 Wt2i = 30.123
 W2i  = 144.886
+
+# U2   = 418.907
+# Crat = 0.9723
+# Wrat = 0.55938
+# beta2_star = -11
+# Ct2  = 364.737
+# W2   = 157.872
+# Ct2i = 388.784
+# Wt2i = 30.123
+# W2i  = 157.872
+
+# U2   = 460.798
+# Crat = 0.86904
+# Wrat = 0.53632
+# beta2_star = 40
+# Ct2  = 331.579
+# W2   = 167.02
+# Ct2i = 353.44
+# Wt2i = 107.358
+# W2i  = 167.02
+
 
 ###########Calculating remaining velocities and angles in outlet triangles
 ##Real flow triangle
@@ -268,7 +285,7 @@ alpha3star = alpha3+i3
 
 table3("r3","b3", "A3","P03","P3","T03","T3","rho03","rho3","Ct3","Cr3","C3","M3","alpha3","i3","alpha3*")
 table3(round(r3,3),round(b3,3),round(A3,3),round(P03,3),round(P3,3),round(T03,3),round(T3,3),round(rho03,3),round(rho3,3),round(Ct3,3),round(Cr3,3),round(C3,3),round(M3,3),round(alpha3,3),round(i3,3),round(alpha3star,3))
-print(tabulate(tab3))
+#print(tabulate(tab3))
 
 #####################################################################################
 #                                Diffuser throat                                    #
@@ -276,7 +293,7 @@ print(tabulate(tab3))
 AR_star = 0.9
 M_star  = 1
 b_star  = b3
-w_star  = b_star*AR_star
+w_star  = b_star*AR_star/1.0125
 
 M4      = 0.1 #Diffuser exit condition
 
@@ -304,14 +321,16 @@ rho4 = P4/(Rs/1000*T4)
 #Throat conditions
 T0star  = T03
 Tstar   = T0star*Tstar_ratio
-Pstar   = P4/P4Pstar
-P0star  = Pstar/Pstar_ratio
+P0star  = P03#Pstar/Pstar_ratio
+Pstar   = P0star*Pstar_ratio#P4/P4Pstar
+
 
 phip   = (Pstar-P3)/(P03-P3) #LE to throat static pressure recovery coefficient
 Bstar_throat = 0.03
-Astar = mdot*np.sqrt(T0star*Rs/1000/gamma)/(1*(1+(gamma-1)/2*1**2)**((gamma+1)/(2-2*gamma))*P0star*(1-Bstar_throat))
+#Astar = mdot*np.sqrt(T0star*Rs/1000/gamma)/(1*(1+(gamma-1)/2*1**2)**((gamma+1)/(2-2*gamma))*P0star*(1-Bstar_throat))
 
-
+A3Astar = 1.01
+Astar=A3/1.01
 
 #####################################################################################
 #                                Diffuser exit                                      #
@@ -319,8 +338,50 @@ Astar = mdot*np.sqrt(T0star*Rs/1000/gamma)/(1*(1+(gamma-1)/2*1**2)**((gamma+1)/(
 r4r3 = 3 #Radius ratio
 r4 = r3*r4r3
 A4  = A4_ratio*Astar
-Nv = 19
-
+Nv = 21
+phis= 360/Nv
 
 #Throat to exit static pressure recovery
 Cp = (P4-Pstar)/(P0star-Pstar)
+
+omega = 125.75
+##Slater's values
+
+X = np.linspace(0,w_star,10)
+Y1 = -np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*X + r3*(np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
+
+fig2 = plt.figure()
+plt.plot(X,Y1)
+#plt.plot(X,Y2)
+circle1 = plt.Circle((0,r3),w_star,color='r', fill=False)
+plt.gca().add_patch(circle1)
+# plt.xlim([-w_star, w_star])
+# plt.ylim([0, r3+ w_star])
+#plt.show()
+
+####Because Mexit = 0.1 and the area ratio is outside the chart bounds
+twotheta = 12
+Lwstar   = 25
+
+eta_ts = T01/(T4-T01)*((P4/P01)**((gamma-1)/gamma)-1)
+
+print("Impeller inlet")
+print(tabulate(tab1))
+tab2 = []
+table2('Triangle',"Crat","Wrat", "beta2*",'beta2',"Ct2","W2","Wt2","W2i","U2")
+table2('Actual',Crat,Wrat,beta2_star,beta2,round(Ct2,3),round(W2,3),round(Wt2,3),round(W2,3),round(U2,3))
+table2('Ideal',Crat,Wrat, beta2_star,beta2,round(Ct2i,3),round(W2i,3),round(Wt2i,3),round(W2i,3),round(U2,3))
+print("Impeller exit")
+print(tabulate(tab2))
+print("Station 3")
+print(tabulate(tab3))
+print("Choke")
+tab2 = []
+table2('Parameter','AR','P0*','P*','T0*','T*','A*','PHIp')
+table2('Value',round(AR_star,3),round(P0star,3),round(Pstar,3),round(T0star,3),round(Tstar,3),round(Astar,3),round(phip,3))
+print(tabulate(tab2))
+print("Exit conditions")
+tab2 = []
+table2('Parameter','P04','P4','T04','T4','A4','Cp','2Theta','L/w*','eta_ts')
+table2('Value',round(P04,3),round(P4,3),round(T04,3),round(T4,3),round(A4,3),round(Cp,3),round(twotheta,3),round(Lwstar,3),round(eta_ts,3))
+print(tabulate(tab2))
