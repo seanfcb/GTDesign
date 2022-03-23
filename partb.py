@@ -11,10 +11,13 @@ from scipy.optimize import *
 #####################################################################################
 tab1 = []
 tab2 = []
+tab3 = []
 def table1(*args):
     tab1.append(args)
 def table2(*args):
     tab2.append(args)
+def table3(*args):
+    tab3.append(args)
 
 def eqn6(M1,C1,T01,gamma,Rs):
     return C1/np.sqrt(T01) - np.sqrt(gamma*Rs)*M1*(1+(gamma-1)/2*M1**2)**(-0.5)
@@ -63,7 +66,7 @@ spec = 0*r1sh
 #####################################################################################
 #                              Begin solution                                       #
 #####################################################################################
-fig = plt.figure()
+#fig = plt.figure()
 
 for i in alpha1: #iterating for every alpha value
     rcount = 0
@@ -92,12 +95,12 @@ for i in alpha1: #iterating for every alpha value
         W1sh = np.sqrt(C1x[rcount]**2+(U1sh[rcount]-C1x[rcount]*np.tan(i))**2)
         Mrel1sh[rcount] = W1sh/c1
         rcount = rcount + 1
-    rc('font', **{'family': 'serif', 'serif': ['Times New Roman']})
-    rc('text', usetex=True)
-    plt.plot(C1x,Mrel1sh, label = r'$\alpha_1 = {}$'.format(round(i*180/np.pi,3)))
-    plt.xlabel(r"$C_{1x}/U_{1sh}$")
-    plt.ylabel(r"$M_{rel,1sh}$")
-    plt.legend()
+    # rc('font', **{'family': 'serif', 'serif': ['Times New Roman']})
+    # rc('text', usetex=True)
+    # plt.plot(C1x,Mrel1sh, label = r'$\alpha_1 = {}$'.format(round(i*180/np.pi,3)))
+    # plt.xlabel(r"$C_{1x}/U_{1sh}$")
+    # plt.ylabel(r"$M_{rel,1sh}$")
+    # plt.legend()
 
 #fig.savefig('Mrel1sh_vs_C1x.png', dpi=fig.dpi)
 #plt.show()
@@ -143,10 +146,6 @@ beta1sh_star = beta1h - ish_min #blade metal angle
 #                                 Display inlet properties                          #
 #####################################################################################
 
-# table1("Location", "alpha1","beta1", "i1", "N (RPM)","Specific Speed", "Mrel1sh", "r1 (m)", "C1x","C1","U1","W1")
-# table1("Hub",round(alpha1*180/np.pi,4),beta1h,alpha1*180/np.pi-beta1h,N,spec,Mrel1sh,r1h,C1x,C1,U1h,W1h)
-# table1("Mean",round(alpha1*180/np.pi,4),beta1m,alpha1*180/np.pi-beta1m,N,spec,Mrel1sh,r1m,C1x,C1,U1m,W1m)
-# table1("Shroud",round(alpha1*180/np.pi,4),beta1sh,alpha1*180/np.pi-beta1sh,N,spec,Mrel1sh,r1sh,C1x,C1,U1sh,W1sh)
 table1("Location", "alpha1","beta1", "Blade metal angle", "Incidence", "N (RPM)","Specific Speed", "Mrel1sh", "r1 (m)", "C1x","C1","U1","W1")
 table1("Hub",round(alpha1*180/np.pi,4),beta1h,beta1h_star,ih_min,N,spec,Mrel1sh,r1h,C1x,C1,U1h,W1h)
 table1("Mean",round(alpha1*180/np.pi,4),beta1m,beta1m_star,im_min,N,spec,Mrel1sh,r1m,C1x,C1,U1m,W1m)
@@ -181,7 +180,7 @@ for j in U2:
             Crat = Cr2/C1x
             if Crat > 0.8 and Crat < 1 and Wrat > 0.5 and Wrat < 0.6:
                 table2(round(np.abs(Crat),5),round(Wrat,5), round(i*180/np.pi,3),round(Ct2,3),round(W2,3),round(Ct2i,3),round(Wt2i,3),round(W2i,3),round(j,3))
-print(tabulate(tab2))
+#print(tabulate(tab2))
 
 ############Taking velocities and angles from table2
 U2   = 418.907
@@ -193,6 +192,27 @@ W2   = 144.886
 Ct2i = 388.784
 Wt2i = 30.123
 W2i  = 144.886
+
+# U2   = 418.907
+# Crat = 0.9723
+# Wrat = 0.55938
+# beta2_star = -11
+# Ct2  = 364.737
+# W2   = 157.872
+# Ct2i = 388.784
+# Wt2i = 30.123
+# W2i  = 157.872
+
+# U2   = 460.798
+# Crat = 0.86904
+# Wrat = 0.53632
+# beta2_star = 40
+# Ct2  = 331.579
+# W2   = 167.02
+# Ct2i = 353.44
+# Wt2i = 107.358
+# W2i  = 167.02
+
 
 ###########Calculating remaining velocities and angles in outlet triangles
 ##Real flow triangle
@@ -215,11 +235,153 @@ delta = beta2_star - beta2#Deviation
 #####################################################################################
 #                                 Impeller blockage                                 #
 #####################################################################################
-T2   = T02*(1+(gamma-1)/2*M2**2)**(-1)
-P2   = P02*(T2/T02)**(gamma/(gamma-1))#Static pressure at 2
-rho2 = P2/(Rs/1000*T2)
+T2            = T02*(1+(gamma-1)/2*M2**2)**(-1)
+P02           = P01*(1+0.88*(T02/T01-1))**(gamma/(gamma-1))#Total pressure at impeller exit
+P2            = P02*(T2/T02)**(gamma/(gamma-1))#Static pressure at 2
+rho2          = P2/(Rs/1000*T2)
 B2_star_aero  = (0.12+0.17)/2
 B2_star_blade = (0.03+0.06)/2
 B2_star       = B2_star_aero+B2_star_blade
 CD2           = 1-B2_star
 b2            = mdot/(rho2*Cr2*2*np.pi*r2*CD2)
+A2            = 2*np.pi*r2*b2
+
+#####################################################################################
+#                                Diffuser inlet                                     #
+#####################################################################################
+
+r3r2 = 1.05 #r3/r2, [1.05;1.10]. Smallest value selected to minimize gaspath length
+r3   = r3r2*r2
+b3   = b2
+A3   = 2*np.pi*r3*b3
+P03  = 0.99*P02
+T03  = T02
+rho03 = P03/(Rs/1000*T03)
+B3_star = 0.125 #Assumption
+
+
+Ct3  = Ct2*r2/r3
+
+def station3(Cr3,Ct3,P02,P03,Cpa,Rs,mdot,rho2,r2,r3,Cr2):
+    C3 = np.sqrt(Cr3**2+Ct3**2)
+    T3 = T03-C3**2/(2*Cpa)
+    P3 = P03*(T3/T03)**(gamma/(gamma-1))
+    rho3 = P3/(Rs/1000*T3)
+    #print(C3)
+
+    # print(Cr2*r2*rho2/(r3*rho3))
+    return Cr3 - Cr2*r2*rho2/(r3*rho3)
+
+Cr3 = bisect(station3,0.0001,600, args=(Ct3,P02,P03,Cpa,Rs,mdot,rho2,r2,r3,Cr2)) #Iterating on the previous function to determine optimal Cr3
+C3 = np.sqrt(Cr3**2+Ct3**2)
+T3 = T03-C3**2/(2*Cpa)
+P3 = P03*(T3/T03)**(gamma/(gamma-1))
+rho3 = P3/(Rs/1000*T3)
+
+M3 = bisect(mach_from_Tratio,M2,0.99999,args=(T03,T3,gamma))
+alpha3 = np.arctan(Cr3/Ct3)*180/np.pi
+i3 = -1 #degrees
+alpha3star = alpha3+i3
+
+table3("r3","b3", "A3","P03","P3","T03","T3","rho03","rho3","Ct3","Cr3","C3","M3","alpha3","i3","alpha3*")
+table3(round(r3,3),round(b3,3),round(A3,3),round(P03,3),round(P3,3),round(T03,3),round(T3,3),round(rho03,3),round(rho3,3),round(Ct3,3),round(Cr3,3),round(C3,3),round(M3,3),round(alpha3,3),round(i3,3),round(alpha3star,3))
+#print(tabulate(tab3))
+
+#####################################################################################
+#                                Diffuser throat                                    #
+#####################################################################################
+AR_star = 0.9
+M_star  = 1
+b_star  = b3
+w_star  = b_star*AR_star/1.0125
+
+M4      = 0.1 #Diffuser exit condition
+
+##From the isentropic flow relations
+Tstar_ratio   = (1+((gamma-1)/2)*1**2)**(-1)
+Pstar_ratio   = (1+((gamma-1)/2)*1**2)**(-gamma/(gamma-1))
+Rhostar_ratio = (1+((gamma-1)/2)*1**2)**(-1/(gamma-1))
+Astar_ratio   = ((gamma+1)/2)**(-(gamma+1)/(2*(gamma-1)))*(1+(gamma-1)/2*1**2)**((gamma+1)/(2*(gamma-1)))/1
+
+T4_ratio   = (1+((gamma-1)/2)*M4**2)**(-1)
+P4_ratio   = (1+((gamma-1)/2)*M4**2)**(-gamma/(gamma-1))
+Rho4_ratio = (1+((gamma-1)/2)*M4**2)**(-1/(gamma-1))
+A4_ratio   = ((gamma+1)/2)**(-(gamma+1)/(2*(gamma-1)))*(1+(gamma-1)/2*M4**2)**((gamma+1)/(2*(gamma-1)))/M4
+
+T4Tstar     = T4_ratio/Tstar_ratio
+P4Pstar     = P4_ratio/Pstar_ratio
+rho4rhostar = Rho4_ratio/Rhostar_ratio
+A4Astar     = A4_ratio/Astar_ratio
+
+#Exit static conditions
+P4 = P04*P4_ratio
+T4 = T04*T4_ratio
+rho4 = P4/(Rs/1000*T4)
+
+#Throat conditions
+T0star  = T03
+Tstar   = T0star*Tstar_ratio
+P0star  = P03#Pstar/Pstar_ratio
+Pstar   = P0star*Pstar_ratio#P4/P4Pstar
+
+
+phip   = (Pstar-P3)/(P03-P3) #LE to throat static pressure recovery coefficient
+Bstar_throat = 0.03
+#Astar = mdot*np.sqrt(T0star*Rs/1000/gamma)/(1*(1+(gamma-1)/2*1**2)**((gamma+1)/(2-2*gamma))*P0star*(1-Bstar_throat))
+
+A3Astar = 1.01
+Astar=A3/1.01
+
+#####################################################################################
+#                                Diffuser exit                                      #
+#####################################################################################
+r4r3 = 3 #Radius ratio
+r4 = r3*r4r3
+A4  = A4_ratio*Astar
+Nv = 21
+phis= 360/Nv
+
+#Throat to exit static pressure recovery
+Cp = (P4-Pstar)/(P0star-Pstar)
+
+omega = 125.75
+##Slater's values
+
+X = np.linspace(0,w_star,10)
+Y1 = -np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*X + r3*(np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
+
+fig2 = plt.figure()
+plt.plot(X,Y1)
+#plt.plot(X,Y2)
+circle1 = plt.Circle((0,r3),w_star,color='r', fill=False)
+plt.gca().add_patch(circle1)
+# plt.xlim([-w_star, w_star])
+# plt.ylim([0, r3+ w_star])
+#plt.show()
+
+####Because Mexit = 0.1 and the area ratio is outside the chart bounds
+twotheta = 12
+Lwstar   = 25
+
+eta_ts = T01/(T4-T01)*((P4/P01)**((gamma-1)/gamma)-1)
+
+print("Impeller inlet")
+print(tabulate(tab1))
+tab2 = []
+table2('Triangle',"Crat","Wrat", "beta2*",'beta2',"Ct2","W2","Wt2","W2i","U2")
+table2('Actual',Crat,Wrat,beta2_star,beta2,round(Ct2,3),round(W2,3),round(Wt2,3),round(W2,3),round(U2,3))
+table2('Ideal',Crat,Wrat, beta2_star,beta2,round(Ct2i,3),round(W2i,3),round(Wt2i,3),round(W2i,3),round(U2,3))
+print("Impeller exit")
+print(tabulate(tab2))
+print("Station 3")
+print(tabulate(tab3))
+print("Choke")
+tab2 = []
+table2('Parameter','AR','P0*','P*','T0*','T*','A*','PHIp')
+table2('Value',round(AR_star,3),round(P0star,3),round(Pstar,3),round(T0star,3),round(Tstar,3),round(Astar,3),round(phip,3))
+print(tabulate(tab2))
+print("Exit conditions")
+tab2 = []
+table2('Parameter','P04','P4','T04','T4','A4','Cp','2Theta','L/w*','eta_ts')
+table2('Value',round(P04,3),round(P4,3),round(T04,3),round(T4,3),round(A4,3),round(Cp,3),round(twotheta,3),round(Lwstar,3),round(eta_ts,3))
+print(tabulate(tab2))
