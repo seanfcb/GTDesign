@@ -293,7 +293,7 @@ table3(round(r3,3),round(b3,3),round(A3,3),round(P03,3),round(P3,3),round(T03,3)
 AR_star = 0.9
 M_star  = 1
 b_star  = b3
-w_star  = b_star*AR_star/1.0125
+w_star  = b_star*AR_star#/1.0125
 
 M4      = 0.1 #Diffuser exit condition
 
@@ -307,6 +307,7 @@ T4_ratio   = (1+((gamma-1)/2)*M4**2)**(-1)
 P4_ratio   = (1+((gamma-1)/2)*M4**2)**(-gamma/(gamma-1))
 Rho4_ratio = (1+((gamma-1)/2)*M4**2)**(-1/(gamma-1))
 A4_ratio   = ((gamma+1)/2)**(-(gamma+1)/(2*(gamma-1)))*(1+(gamma-1)/2*M4**2)**((gamma+1)/(2*(gamma-1)))/M4
+A3_ratio   = ((gamma+1)/2)**(-(gamma+1)/(2*(gamma-1)))*(1+(gamma-1)/2*M3**2)**((gamma+1)/(2*(gamma-1)))/M3
 
 T4Tstar     = T4_ratio/Tstar_ratio
 P4Pstar     = P4_ratio/Pstar_ratio
@@ -329,8 +330,9 @@ phip   = (Pstar-P3)/(P03-P3) #LE to throat static pressure recovery coefficient
 Bstar_throat = 0.03
 #Astar = mdot*np.sqrt(T0star*Rs/1000/gamma)/(1*(1+(gamma-1)/2*1**2)**((gamma+1)/(2-2*gamma))*P0star*(1-Bstar_throat))
 
-A3Astar = 1.01
-Astar=A3/1.01
+Astar =A3/A3_ratio*1.0125/(1-Bstar_throat)#Including the choke margin and blockage, assuming the total conditions at 3 are the same as the total conditions at choke
+
+#Astar= mdot*1.0125/P0star*np.sqrt(Rs/1000*T0star/gamma)*np.sqrt((gamma+1)/2)**((gamma+1)/(gamma-1))/(1-Bstar_throat)
 
 #####################################################################################
 #                                Diffuser exit                                      #
@@ -348,7 +350,7 @@ omega = 125.75
 ##Slater's values
 
 X = np.linspace(0,w_star,10)
-Y1 = -np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*X + r3*(np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
+Y1 = -np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*X +r3*(np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
 
 fig2 = plt.figure()
 plt.plot(X,Y1)
@@ -357,7 +359,7 @@ circle1 = plt.Circle((0,r3),w_star,color='r', fill=False)
 plt.gca().add_patch(circle1)
 # plt.xlim([-w_star, w_star])
 # plt.ylim([0, r3+ w_star])
-#plt.show()
+plt.show()
 
 ####Because Mexit = 0.1 and the area ratio is outside the chart bounds
 twotheta = 12
