@@ -193,25 +193,6 @@ Ct2i = 388.784
 Wt2i = 30.123
 W2i  = 144.886
 
-# U2   = 418.907
-# Crat = 0.9723
-# Wrat = 0.55938
-# beta2_star = -11
-# Ct2  = 364.737
-# W2   = 157.872
-# Ct2i = 388.784
-# Wt2i = 30.123
-# W2i  = 157.872
-
-# U2   = 460.798
-# Crat = 0.86904
-# Wrat = 0.53632
-# beta2_star = 40
-# Ct2  = 331.579
-# W2   = 167.02
-# Ct2i = 353.44
-# Wt2i = 107.358
-# W2i  = 167.02
 
 
 ###########Calculating remaining velocities and angles in outlet triangles
@@ -239,8 +220,8 @@ T2            = T02*(1+(gamma-1)/2*M2**2)**(-1)
 P02           = P01*(1+0.88*(T02/T01-1))**(gamma/(gamma-1))#Total pressure at impeller exit
 P2            = P02*(T2/T02)**(gamma/(gamma-1))#Static pressure at 2
 rho2          = P2/(Rs/1000*T2)
-B2_star_aero  = (0.12+0.17)/2
-B2_star_blade = (0.03+0.06)/2
+B2_star_aero  = (0.17)
+B2_star_blade = (0.06)
 B2_star       = B2_star_aero+B2_star_blade
 CD2           = 1-B2_star
 b2            = mdot/(rho2*Cr2*2*np.pi*r2*CD2)
@@ -290,10 +271,10 @@ table3(round(r3,3),round(b3,3),round(A3,3),round(P03,3),round(P3,3),round(T03,3)
 #####################################################################################
 #                                Diffuser throat                                    #
 #####################################################################################
-AR_star = 0.9
+AR_star =0.9
 M_star  = 1
 b_star  = b3
-w_star  = b_star*AR_star#/1.0125
+w_star  = b_star*AR_star*1.0125
 
 M4      = 0.1 #Diffuser exit condition
 
@@ -314,8 +295,14 @@ P4Pstar     = P4_ratio/Pstar_ratio
 rho4rhostar = Rho4_ratio/Rhostar_ratio
 A4Astar     = A4_ratio/Astar_ratio
 
-#Exit static conditions
-P4 = P04*P4_ratio
+# #Exit static conditions
+# P4 = P04*P4_ratio
+# T4 = T04*T4_ratio
+# rho4 = P4/(Rs/1000*T4)
+#From Slater
+P4 = 3*P01
+P04 = P4/P4_ratio
+T04 = T03
 T4 = T04*T4_ratio
 rho4 = P4/(Rs/1000*T4)
 
@@ -327,17 +314,17 @@ Pstar   = P0star*Pstar_ratio#P4/P4Pstar
 
 
 phip   = (Pstar-P3)/(P03-P3) #LE to throat static pressure recovery coefficient
-Bstar_throat = 0.03
+Bstar_throat = 0.04
 #Astar = mdot*np.sqrt(T0star*Rs/1000/gamma)/(1*(1+(gamma-1)/2*1**2)**((gamma+1)/(2-2*gamma))*P0star*(1-Bstar_throat))
 
-Astar =A3/A3_ratio*1.0125/(1-Bstar_throat)#Including the choke margin and blockage, assuming the total conditions at 3 are the same as the total conditions at choke
+Astar =A3/A3_ratio/(1-Bstar_throat)#Including blockage, assuming the total conditions at 3 are the same as the total conditions at choke
 
 #Astar= mdot*1.0125/P0star*np.sqrt(Rs/1000*T0star/gamma)*np.sqrt((gamma+1)/2)**((gamma+1)/(gamma-1))/(1-Bstar_throat)
 
 #####################################################################################
 #                                Diffuser exit                                      #
 #####################################################################################
-r4r3 = 3 #Radius ratio
+r4r3 = 2 #Radius ratio
 r4 = r3*r4r3
 A4  = A4_ratio*Astar
 Nv = 21
@@ -346,19 +333,23 @@ phis= 360/Nv
 #Throat to exit static pressure recovery
 Cp = (P4-Pstar)/(P0star-Pstar)
 
-omega = 125.75
-##Slater's values
+omega = 123.25
 
-X = np.linspace(0,w_star,10)
+
+X = np.linspace(0,w_star,10)#np.linspace(0,w_star,10)
 Y1 = -np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*X +r3*(np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
+V1cl = -np.tan((90-alpha3star)*np.pi/180)*X+r3
+V2cl = -np.tan((90-(alpha3star-phis))*np.pi/180)*X+r3*(np.tan((90-(alpha3star-phis))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
+V2ss = -np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*X+r3*(np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
 
 fig2 = plt.figure()
-plt.plot(X,Y1)
-#plt.plot(X,Y2)
+#plt.plot(X,Y1)
+# plt.plot(X,V1cl,"b--")
+# plt.plot(X,V2cl,"r--")
+plt.plot(X,V2ss,"g-")
+
 circle1 = plt.Circle((0,r3),w_star,color='r', fill=False)
 plt.gca().add_patch(circle1)
-# plt.xlim([-w_star, w_star])
-# plt.ylim([0, r3+ w_star])
 plt.show()
 
 ####Because Mexit = 0.1 and the area ratio is outside the chart bounds
