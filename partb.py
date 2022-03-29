@@ -231,7 +231,7 @@ A2            = 2*np.pi*r2*b2
 #                                Diffuser inlet                                     #
 #####################################################################################
 
-r3r2 = 1.05 #r3/r2, [1.05;1.10]. Smallest value selected to minimize gaspath length
+r3r2 = 1.1 #r3/r2, [1.05;1.10]. Smallest value selected to minimize gaspath length
 r3   = r3r2*r2
 b3   = b2
 A3   = 2*np.pi*r3*b3
@@ -259,7 +259,7 @@ T3 = T03-C3**2/(2*Cpa)
 P3 = P03*(T3/T03)**(gamma/(gamma-1))
 rho3 = P3/(Rs/1000*T3)
 
-M3 = bisect(mach_from_Tratio,M2,0.99999,args=(T03,T3,gamma))
+M3 = bisect(mach_from_Tratio,0.001,0.99999,args=(T03,T3,gamma))
 alpha3 = np.arctan(Cr3/Ct3)*180/np.pi
 i3 = -1 #degrees
 alpha3star = alpha3+i3
@@ -271,7 +271,7 @@ table3(round(r3,3),round(b3,3),round(A3,3),round(P03,3),round(P3,3),round(T03,3)
 #####################################################################################
 #                                Diffuser throat                                    #
 #####################################################################################
-AR_star =0.9
+AR_star = 1.2
 M_star  = 1
 b_star  = b3
 w_star  = b_star*AR_star*1.0125
@@ -327,13 +327,13 @@ Astar =A3/A3_ratio/(1-Bstar_throat)#Including blockage, assuming the total condi
 r4r3 = 2 #Radius ratio
 r4 = r3*r4r3
 A4  = A4_ratio*Astar
-Nv = 21
+Nv = 31
 phis= 360/Nv
 
 #Throat to exit static pressure recovery
 Cp = (P4-Pstar)/(P0star-Pstar)
 
-omega = 123.25
+omega = 86
 
 
 X = np.linspace(0,w_star,10)#np.linspace(0,w_star,10)

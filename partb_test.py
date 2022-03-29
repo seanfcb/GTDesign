@@ -165,7 +165,7 @@ L    = r2 - r1h #impeller axial length
 # r2 = r1h/np.linspace(0.4,0.6,int(3000+1))
 # U2 = N*2*np.pi/60*r2
 sig = 1-np.pi*0.63/(16+16)
-beta2_star = np.linspace(0,40,int(40+1))*np.pi/180#[10*np.pi/180]#
+beta2_star = -np.linspace(0,40,int(40+1))*np.pi/180#[10*np.pi/180]#
 table2("Crat","Wrat", "beta2*","Ct2","W2","Ct2i","Wt2i","W2i","U2")
 for j in U2:
     for i in beta2_star:
@@ -174,44 +174,37 @@ for j in U2:
         Wt2i = (j - Ct2i)
         W2i  = Wt2i/np.sin(i)
         W2   = W2i
-        Wrat = W2/W1sh#np.abs(W2/W1sh)
+        Wrat = np.abs(W2/W1sh)#W2/W1sh#
+        #print(Wrat)
         if Wrat > 0.5 and Wrat < 0.6:
             Cr2 = np.sqrt(W2**2-Wt2i**2)
             Crat = Cr2/C1x
+            #print(Wrat,Crat,i*180/np.pi)
+
             if Crat > 0.8 and Crat < 1 and Wrat > 0.5 and Wrat < 0.6:
                 table2(round(np.abs(Crat),5),round(Wrat,5), round(i*180/np.pi,3),round(Ct2,3),round(W2,3),round(Ct2i,3),round(Wt2i,3),round(W2i,3),round(j,3))
 #print(tabulate(tab2))
 
 ############Taking velocities and angles from table2
+# U2   = 418.907
+# Crat = 0.88916
+# Wrat = 0.50841
+# beta2_star = 12
+# Ct2  = 364.737
+# W2   = 144.886
+# Ct2i = 388.784
+# Wt2i = 30.123
+# W2i  = 144.886
+
 U2   = 418.907
 Crat = 0.88916
 Wrat = 0.50841
-beta2_star = 12
+beta2_star = -12
 Ct2  = 364.737
-W2   = 144.886
+W2   = -144.886
 Ct2i = 388.784
 Wt2i = 30.123
-W2i  = 144.886
-
-# U2   = 418.907
-# Crat = 0.9723
-# Wrat = 0.55938
-# beta2_star = -11
-# Ct2  = 364.737
-# W2   = 157.872
-# Ct2i = 388.784
-# Wt2i = 30.123
-# W2i  = 157.872
-
-# U2   = 460.798
-# Crat = 0.86904
-# Wrat = 0.53632
-# beta2_star = 40
-# Ct2  = 331.579
-# W2   = 167.02
-# Ct2i = 353.44
-# Wt2i = 107.358
-# W2i  = 167.02
+W2i  = -144.886
 
 
 ###########Calculating remaining velocities and angles in outlet triangles
@@ -239,8 +232,8 @@ T2            = T02*(1+(gamma-1)/2*M2**2)**(-1)
 P02           = P01*(1+0.88*(T02/T01-1))**(gamma/(gamma-1))#Total pressure at impeller exit
 P2            = P02*(T2/T02)**(gamma/(gamma-1))#Static pressure at 2
 rho2          = P2/(Rs/1000*T2)
-B2_star_aero  = (0.12+0.17)/2
-B2_star_blade = (0.03+0.06)/2
+B2_star_aero  = (0.17)
+B2_star_blade = (0.06)
 B2_star       = B2_star_aero+B2_star_blade
 CD2           = 1-B2_star
 b2            = mdot/(rho2*Cr2*2*np.pi*r2*CD2)
@@ -257,10 +250,10 @@ A3   = 2*np.pi*r3*b3
 P03  = 0.99*P02
 T03  = T02
 rho03 = P03/(Rs/1000*T03)
-B3_star = 0.125 #Assumption
+#B3_star = 0.125 #Assumption
 
 
-Ct3  = Ct2*r2/r3
+Ct3  = -Ct2*r2/r3
 
 def station3(Cr3,Ct3,P02,P03,Cpa,Rs,mdot,rho2,r2,r3,Cr2):
     C3 = np.sqrt(Cr3**2+Ct3**2)
@@ -278,8 +271,10 @@ T3 = T03-C3**2/(2*Cpa)
 P3 = P03*(T3/T03)**(gamma/(gamma-1))
 rho3 = P3/(Rs/1000*T3)
 
-M3 = bisect(mach_from_Tratio,M2,0.99999,args=(T03,T3,gamma))
-alpha3 = np.arctan(Cr3/Ct3)*180/np.pi
+def Mach3(M,T03,gamma,Rs):
+    return C3/np.sqrt(T03) - np.sqrt(gamma*Rs)*M*(1+(gamma-1)/2*M**2)**(-0.5)
+M3 = bisect(Mach3,0.00001,0.9999999,args=(T03,gamma,Rs))
+alpha3 = -np.arctan(Cr3/Ct3)*180/np.pi
 i3 = -1 #degrees
 alpha3star = alpha3+i3
 
@@ -290,10 +285,10 @@ table3(round(r3,3),round(b3,3),round(A3,3),round(P03,3),round(P3,3),round(T03,3)
 #####################################################################################
 #                                Diffuser throat                                    #
 #####################################################################################
-AR_star = 0.9
+AR_star =0.9
 M_star  = 1
 b_star  = b3
-w_star  = b_star*AR_star/1.0125
+w_star  = b_star*AR_star*1.0125
 
 M4      = 0.1 #Diffuser exit condition
 
@@ -307,14 +302,21 @@ T4_ratio   = (1+((gamma-1)/2)*M4**2)**(-1)
 P4_ratio   = (1+((gamma-1)/2)*M4**2)**(-gamma/(gamma-1))
 Rho4_ratio = (1+((gamma-1)/2)*M4**2)**(-1/(gamma-1))
 A4_ratio   = ((gamma+1)/2)**(-(gamma+1)/(2*(gamma-1)))*(1+(gamma-1)/2*M4**2)**((gamma+1)/(2*(gamma-1)))/M4
+A3_ratio   = ((gamma+1)/2)**(-(gamma+1)/(2*(gamma-1)))*(1+(gamma-1)/2*M3**2)**((gamma+1)/(2*(gamma-1)))/M3
 
 T4Tstar     = T4_ratio/Tstar_ratio
 P4Pstar     = P4_ratio/Pstar_ratio
 rho4rhostar = Rho4_ratio/Rhostar_ratio
 A4Astar     = A4_ratio/Astar_ratio
 
-#Exit static conditions
-P4 = P04*P4_ratio
+# #Exit static conditions
+# P4 = P04*P4_ratio
+# T4 = T04*T4_ratio
+# rho4 = P4/(Rs/1000*T4)
+#From Slater
+P4 = 3*P01
+P04 = P4/P4_ratio
+T04 = T03
 T4 = T04*T4_ratio
 rho4 = P4/(Rs/1000*T4)
 
@@ -326,16 +328,17 @@ Pstar   = P0star*Pstar_ratio#P4/P4Pstar
 
 
 phip   = (Pstar-P3)/(P03-P3) #LE to throat static pressure recovery coefficient
-Bstar_throat = 0.03
+Bstar_throat = 0.04
 #Astar = mdot*np.sqrt(T0star*Rs/1000/gamma)/(1*(1+(gamma-1)/2*1**2)**((gamma+1)/(2-2*gamma))*P0star*(1-Bstar_throat))
 
-A3Astar = 1.01
-Astar=A3/1.01
+Astar =A3/A3_ratio/(1-Bstar_throat)#Including blockage, assuming the total conditions at 3 are the same as the total conditions at choke
+
+#Astar= mdot*1.0125/P0star*np.sqrt(Rs/1000*T0star/gamma)*np.sqrt((gamma+1)/2)**((gamma+1)/(gamma-1))/(1-Bstar_throat)
 
 #####################################################################################
 #                                Diffuser exit                                      #
 #####################################################################################
-r4r3 = 3 #Radius ratio
+r4r3 = 2 #Radius ratio
 r4 = r3*r4r3
 A4  = A4_ratio*Astar
 Nv = 21
@@ -344,20 +347,24 @@ phis= 360/Nv
 #Throat to exit static pressure recovery
 Cp = (P4-Pstar)/(P0star-Pstar)
 
-omega = 125.75
-##Slater's values
+omega = 100
 
-X = np.linspace(0,w_star,10)
-Y1 = -np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*X + r3*(np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
+
+X = np.linspace(0,w_star,10)#np.linspace(0,w_star,10)
+Y1 = -np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*X +r3*(np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
+V1cl = -np.tan((90-alpha3star)*np.pi/180)*X+r3
+V2cl = -np.tan((90-(alpha3star-phis))*np.pi/180)*X+r3*(np.tan((90-(alpha3star-phis))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
+V2ss = -np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*X+r3*(np.tan((90-(alpha3star-phis+omega/2))*np.pi/180)*np.sin(phis*np.pi/180)+np.cos(phis*np.pi/180))
 
 fig2 = plt.figure()
-plt.plot(X,Y1)
-#plt.plot(X,Y2)
+#plt.plot(X,Y1)
+# plt.plot(X,V1cl,"b--")
+plt.plot(X,V2cl,"r--")
+plt.plot(X,V2ss,"g-")
+
 circle1 = plt.Circle((0,r3),w_star,color='r', fill=False)
 plt.gca().add_patch(circle1)
-# plt.xlim([-w_star, w_star])
-# plt.ylim([0, r3+ w_star])
-#plt.show()
+plt.show()
 
 ####Because Mexit = 0.1 and the area ratio is outside the chart bounds
 twotheta = 12
